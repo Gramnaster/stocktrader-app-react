@@ -8,5 +8,6 @@ export {default as Home} from './Home/Home';
 export {default as DashboardUser} from './DashboardUser/DashboardUser';
 export {default as DashboardAdmin} from './DashboardAdmin/DashboardAdmin';
 export {default as Companies} from './Companies/Companies';
+export {default as About} from './About/About';
 export {default as Error} from './ZZMisc/Error';
 export {default as NotFound} from './ZZMisc/NotFound';
