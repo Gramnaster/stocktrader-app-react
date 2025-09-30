@@ -63,6 +63,10 @@ const router = createBrowserRouter([
     element: <Signup />,
     errorElement: <Error />,
   },
+  {
+    path: '*',
+    element: <NotFound />
+  }
 ]);
 
 function App() {
