@@ -23,7 +23,7 @@ const Signup = () => {
             <FormInput type='text' label='Country (required)' name='first_name' placeholder='Philippines' />
             <FormInput type='text' label='Mobile No (required)' name='middle_name' placeholder='+63 999 999 999' />
             <div className="my-4 gap-y-4">
-              <button className='btn bg-neutral-800 btn-block'><Link to='/'>Cancel</Link></button>
+              <Link to='/'><button className='btn bg-neutral-800 btn-block'>Cancel</button></Link>
               <SubmitBtn text='Sign Up' />
             </div>
           <p>

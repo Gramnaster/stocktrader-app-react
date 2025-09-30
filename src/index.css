@@ -2,7 +2,8 @@
 @plugin "daisyui";
 
 :root {
-  font-family: system-ui, 'Roboto Mono', monospace;
+  font-family: 'Roboto Mono', monospace, system-ui;
+  font-size: 16px;
   line-height: 1.5;
   font-weight: 400;
 

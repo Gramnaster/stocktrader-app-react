@@ -28,9 +28,11 @@ const Login = () => {
           <button type="button" className="btn btn-primary btn-block">
             Guest User
           </button>
-          <button type="button" className="btn bg-neutral-800 btn-block">
-            Cancel
-          </button>
+          <Link to="/" className="btn bg-neutral-800 btn-block">
+            <button type="button" className="btn bg-neutral-800 btn-block">
+              Cancel
+            </button>
+          </Link>
           <p>
             Not yet registered?
             <Link
