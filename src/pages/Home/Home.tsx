@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from '../../components';
+import Landing from './Landing';
 
 const Home = () => {
   return (

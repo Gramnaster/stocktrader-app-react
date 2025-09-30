@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react';
 import { customFetch } from '../utils';
 
 interface StocksType {
-  id: number,
-  name: string,
-  ticker: string,
-  exchange: string,
-  web_url: string,
-  logo_url: string,
-  market_cap: number,
-  current_price: number,
-  daily_change: number,
-  percent_daily_change: number,
-  updated_at: Date
+  id: number;
+  name: string;
+  ticker: string;
+  exchange: string;
+  web_url: string;
+  logo_url: string;
+  market_cap: number;
+  current_price: number;
+  daily_change: number;
+  percent_daily_change: number;
+  updated_at: Date;
 }
 
 const StocksList = () => {
@@ -38,9 +38,8 @@ const StocksList = () => {
 
   const sortedStocks = [...stocks].sort((a, b) => a.name.localeCompare(b.name));
 
-  // useEffect((), [])
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-h-[1000px] overflow-y-auto">
       <table className="table w-full">
         <thead>
           <tr>
@@ -54,14 +53,20 @@ const StocksList = () => {
         <tbody>
           {sortedStocks.map((stock) => {
             // Calculate Previous Close: current_price - daily_change
-            const prevClose = Number(stock.current_price) - Number(stock.daily_change);
+            const prevClose =
+              Number(stock.current_price) - Number(stock.daily_change);
             return (
               <tr key={stock.id}>
                 <td>{stock.name}</td>
                 <td className="text-right">{stock.current_price}</td>
                 <td className="text-right">{stock.daily_change}</td>
                 <td className="text-right">{prevClose.toFixed(2)}</td>
-                <td className="text-right">{stock.market_cap}</td>
+                <td className="text-right">
+                  {Number(stock.market_cap).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </td>
               </tr>
             );
           })}

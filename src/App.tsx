@@ -18,7 +18,7 @@ import {
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 // Loaders
-import { loader as landingLoader } from './pages/Home/Landing';
+import Landing, { loader as landingLoader } from './pages/Home/Landing';
 
 const router = createBrowserRouter([
   {
@@ -28,37 +28,48 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <Landing />,
+        errorElement: <ErrorElement />,
+      },
+      {
+        path: 'dashboard',
         element: <DashboardUser />,
         errorElement: <ErrorElement />,
-        loader: landingLoader
-      },
-      {
-        path: 'about',
-        element: <About />,
-      },
-      {
-        path: 'companies',
-        element: <Companies />,
-      },
-      {
-        path: 'wallet/:id',
-        element: <Wallet />,
-      },
-      {
-        path: 'stocktrading/:id',
-        element: <Stocktrading />,
-      },
-      {
-        path: 'transactions/:id',
-        element: <Receipts />,
-      },
-      {
-        path: 'admin',
-        element: <DashboardAdmin />,
+        loader: landingLoader,
         children: [
           {
-            index: true,
-            element: <Traders />,
+            path: 'about',
+            element: <About />,
+          },
+          {
+            path: 'companies',
+            element: <Companies />,
+          },
+          {
+            path: 'wallet/:id',
+            element: <Wallet />,
+          },
+          {
+            path: 'stocktrading/:id',
+            element: <Stocktrading />,
+          },
+          {
+            path: 'transactions/:id',
+            element: <Receipts />,
+          },
+          {
+            path: 'admin',
+            element: <DashboardAdmin />,
+            children: [
+              {
+                index: true,
+                element: <Traders />,
+              },
+              {
+                path: 'transactions',
+                element: <Receipts />,
+              },
+            ],
           },
         ],
       },
