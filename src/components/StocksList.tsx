@@ -39,7 +39,7 @@ const StocksList = () => {
   const sortedStocks = [...stocks].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="overflow-x-auto max-h-[1000px] overflow-y-auto">
+    <div className="overflow-x-auto max-h-[750px] overflow-y-auto">
       <table className="table w-full">
         <thead>
           <tr>
