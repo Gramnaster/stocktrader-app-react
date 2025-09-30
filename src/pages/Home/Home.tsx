@@ -5,7 +5,8 @@ const Home = () => {
   return (
     <>
       <nav>
-        <span className='text-4x1 text-primary'>Home</span>
+        <span className='text-4x1 text-primary'>Orbital Finances</span>
+        <p> Hello, can you see this better? </p>
       </nav>
       <Outlet />
     </>
