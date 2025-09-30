@@ -1,6 +1,8 @@
+import { StocksList } from "../../components"
+
 const Companies = () => {
   return (
-    <div>Companies</div>
+    <div><StocksList /></div>
   )
 }
 export default Companies

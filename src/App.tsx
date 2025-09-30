@@ -1,3 +1,4 @@
+import { ErrorElement } from './components';
 import {
   Companies,
   DashboardAdmin,
@@ -16,6 +17,9 @@ import {
 
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
+// Loaders
+import { loader as landingLoader } from './pages/Home/Landing';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -25,6 +29,8 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardUser />,
+        errorElement: <ErrorElement />,
+        loader: landingLoader
       },
       {
         path: 'about',
