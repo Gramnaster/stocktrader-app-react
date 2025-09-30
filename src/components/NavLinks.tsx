@@ -1,4 +1,6 @@
+import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import type { RootState } from '../store';
 
 interface LinksType {
   id: number;
@@ -12,10 +14,12 @@ const links: LinksType[] = [
 ];
 
 const NavLinks = () => {
+  const user = useSelector((state: RootState) => state.userState.user);
   return (
     <>
       {links.map((link) => {
         const { id, url, text } = link;
+        if ((url === 'companies')&& !user) return null
         return (
           <li key={id}>
             <NavLink to={url} className="capitalize">

@@ -1,13 +1,25 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import logoIcon from '../assets/images/logo-1.png';
 import userIcon from '../assets/images/icon-user.png';
 import languageIcon from '../assets/images/icon-language.png';
 import hamburgerIcon from '../assets/images/icon-hamburger.png';
 import NavLinks from './NavLinks';
 // import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../store';
+import { logoutUser } from '../features/user/userSlice';
 
 const Navbar = () => {
   // const [theme, setTheme] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.userState.user);
+
+  const handleLogout = () => {
+    navigate('/');
+    // dispatch()
+    dispatch(logoutUser());
+  };
 
   return (
     <nav className="bg-neutral px-10 max-h-[75px]">
@@ -40,11 +52,24 @@ const Navbar = () => {
         </div>
         <div className="navbar-end">
           <div className="flex gap-x-y justify-center items-center ">
-            <button className="btn btn-primary h-[33px]">
-              <Link to="/login" className="link link-hover text-cs sm:text-sm">
-                Login
-              </Link>
-            </button>
+            {user ? (
+              <div className="flex gap-x-2 sm:gap-x-8 items-center">
+                <p className="text-xs sm:text-sm">Hello, {user.first_name}</p>
+                <button className="btn btn-xs" onClick={handleLogout}>
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button className="btn btn-primary h-[33px]">
+                <Link
+                  to="/login"
+                  className="link link-hover text-cs sm:text-sm"
+                >
+                  Login
+                </Link>
+              </button>
+            )}
+
             <button className="btn bg-transparent h-[28px] ml-4">
               <img src={userIcon} alt="user-icon" />
             </button>
