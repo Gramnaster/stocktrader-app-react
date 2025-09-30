@@ -4,5 +4,7 @@ export {default as Stocktrading} from './Stocktrading/Stocktrading';
 export {default as Signup} from './Signup/Signup';
 export {default as Receipts} from './Receipts/Receipts';
 export {default as Login} from './Login/Login';
+export {default as Home} from './Home/Home';
 export {default as DashboardUser} from './DashboardUser/DashboardUser';
 export {default as DashboardAdmin} from './DashboardAdmin/DashboardAdmin';
+export {default as Error} from './ZZMisc/Error';
