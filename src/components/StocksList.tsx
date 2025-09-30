@@ -36,6 +36,8 @@ const StocksList = () => {
     getStocks();
   }, []);
 
+  const sortedStocks = [...stocks].sort((a, b) => a.name.localeCompare(b.name));
+
   // useEffect((), [])
   return (
     <div className="overflow-x-auto">
@@ -50,7 +52,7 @@ const StocksList = () => {
           </tr>
         </thead>
         <tbody>
-          {stocks.map((stock) => {
+          {sortedStocks.map((stock) => {
             // Calculate Previous Close: current_price - daily_change
             const prevClose = Number(stock.current_price) - Number(stock.daily_change);
             return (
