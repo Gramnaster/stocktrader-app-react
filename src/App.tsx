@@ -10,6 +10,7 @@ import {
   Traders,
   Wallet,
   Error,
+  About,
   // NotFound
 } from './pages/index';
 
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardUser />,
+      },
+      {
+        path: 'about',
+        element: <About />,
       },
       {
         path: 'companies',
@@ -47,9 +52,9 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Traders />
-          }
-        ]
+            element: <Traders />,
+          },
+        ],
       },
     ],
   },
@@ -65,14 +70,12 @@ const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <Error />
-  }
+    element: <Error />,
+  },
 ]);
 
 function App() {
-  return (
-      <RouterProvider router={router} />
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

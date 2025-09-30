@@ -4,10 +4,10 @@ import userIcon from '../assets/images/icon-user.png';
 import languageIcon from '../assets/images/icon-language.png';
 import hamburgerIcon from '../assets/images/icon-hamburger.png';
 import NavLinks from './NavLinks';
-import { useState } from 'react';
+// import { useState } from 'react';
 
 const Navbar = () => {
-  const [theme, setTheme] = useState(false);
+  // const [theme, setTheme] = useState(false);
 
   return (
     <nav className="bg-neutral px-10 max-h-[75px]">
