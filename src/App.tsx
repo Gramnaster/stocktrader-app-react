@@ -10,7 +10,7 @@ import {
   Traders,
   Wallet,
   Error,
-  NotFound
+  // NotFound
 } from './pages/index';
 
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';

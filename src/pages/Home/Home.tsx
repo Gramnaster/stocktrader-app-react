@@ -1,15 +1,14 @@
-import { Outlet } from "react-router-dom"
-
+import { Outlet } from 'react-router-dom';
+import { Header } from '../../components';
 
 const Home = () => {
   return (
     <>
-      <nav>
-        <span className='text-4x1 text-primary'>Orbital Finances</span>
-        <p> Hello, can you see this better? </p>
-      </nav>
-      <Outlet />
+      <Header />
+      <section className="align-element py-20">
+        <Outlet />
+      </section>
     </>
   );
-}
-export default Home
+};
+export default Home;

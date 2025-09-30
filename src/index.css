@@ -16,3 +16,9 @@
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
 }
+
+@layer components {
+  .align-element {
+    @apply mx-auto max-w-6xl px-8;
+  }
+}
