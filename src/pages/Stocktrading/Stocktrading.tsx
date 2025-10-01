@@ -88,12 +88,23 @@ export const loader = (queryClient: any, store: any) => async ({ params }: any) 
   };
 
   try {
-    const [wallet, portfolio, stock, allStocks] = await Promise.all([
+    // Always load wallet, portfolio, and all stocks
+    const [wallet, portfolio, allStocks] = await Promise.all([
       queryClient.ensureQueryData(walletQuery),
       queryClient.ensureQueryData(portfolioQuery),
-      queryClient.ensureQueryData(stockQuery),
       queryClient.ensureQueryData(allStocksQuery),
     ]);
+
+    // Only load specific stock if stockId is provided
+    let stock = {};
+    if (stockId && !isNaN(parseInt(stockId))) {
+      try {
+        stock = await queryClient.ensureQueryData(stockQuery);
+      } catch (stockError) {
+        console.warn(`Failed to load specific stock ${stockId}:`, stockError);
+        // Don't fail the entire page if just the specific stock fails
+      }
+    }
 
     return { wallet, portfolio, stock, allStocks };
   } catch (error: any) {
@@ -112,7 +123,19 @@ const Stocktrading = () => {
   };
   const { id: stockId } = useParams();
   const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
-  const [selectedStockId, setSelectedStockId] = useState<number>(parseInt(stockId || '0'));
+  
+  // Initialize selectedStockId: use URL param, or first stock from allStocks, or 0
+  const [selectedStockId, setSelectedStockId] = useState<number>(() => {
+    if (stockId && !isNaN(parseInt(stockId))) {
+      return parseInt(stockId);
+    }
+    // If no stockId in URL, default to first available stock
+    if (initialAllStocks && initialAllStocks.length > 0) {
+      return initialAllStocks[0].id;
+    }
+    return 0;
+  });
+  
   const queryClient = useQueryClient();
   const user = useSelector((state: RootState) => state.userState.user);
 
@@ -142,7 +165,7 @@ const Stocktrading = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Live stock data
+  // Live stock data (only query if stockId exists and is valid)
   const { data: stock } = useQuery({
     queryKey: ['stock', stockId],
     queryFn: async () => {
@@ -153,6 +176,7 @@ const Stocktrading = () => {
     },
     initialData: initialStock,
     refetchOnWindowFocus: false,
+    enabled: Boolean(stockId && !isNaN(parseInt(stockId))), // Only run query if stockId is valid
   });
 
   // Live all stocks data
@@ -177,6 +201,16 @@ const Stocktrading = () => {
   // Get selected stock for trading (can be different from URL stock)
   const selectedStock = allStocks.find((s: Stock) => s.id === selectedStockId) || stock || null;
   const selectedStockInPortfolio = portfolio.find((item: PortfolioItem) => item.stock.id === selectedStockId);
+
+  // Update selectedStockId if current selection is invalid and allStocks are available
+  useEffect(() => {
+    if (allStocks && allStocks.length > 0) {
+      // If current selectedStockId is 0 or doesn't exist in allStocks, select the first one
+      if (selectedStockId === 0 || !allStocks.find(s => s.id === selectedStockId)) {
+        setSelectedStockId(allStocks[0].id);
+      }
+    }
+  }, [allStocks, selectedStockId]);
 
   // Handle stock selection change
   const handleStockSelection = (stockId: string) => {
