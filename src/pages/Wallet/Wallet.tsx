@@ -35,12 +35,14 @@ export const loader = (queryClient: any, store: any) => async () => {
   const walletQuery = {
     queryKey: ['wallet', user.id],
     queryFn: async () => {
-      console.log('Making GET request with Authorization header via Vite proxy');
+      console.log(
+        'Making GET request with Authorization header via Vite proxy'
+      );
       console.log('Token from user object:', user.token);
-      
+
       return customFetch.get('/wallets/my_wallet', {
         headers: {
-          'Authorization': user.token,
+          Authorization: user.token,
         },
       });
     },
@@ -62,42 +64,47 @@ export const loader = (queryClient: any, store: any) => async () => {
 };
 
 // Unified Wallet Action
-export const walletAction = (store: any) => async ({ request }: any) => {
-  const storeState = store.getState();
-  const user = storeState.userState?.user;
-  
-  if (!user) {
-    toast.error('You must be logged in');
-    return redirect('/login');
-  }
+export const walletAction =
+  (store: any) =>
+  async ({ request }: any) => {
+    const storeState = store.getState();
+    const user = storeState.userState?.user;
 
-  const formData = await request.formData();
-  const action = formData.get('action');
-  const amount = formData.get('amount');
+    if (!user) {
+      toast.error('You must be logged in');
+      return redirect('/login');
+    }
 
-  try {
-    const endpoint = action === 'deposit' ? '/wallets/deposit' : '/wallets/withdraw';
-    
-    await customFetch.post(endpoint, 
-      { amount: parseFloat(amount as string) }, // Send as JSON object
-      {
-        headers: {
-          'Authorization': user.token,
-          'Content-Type': 'application/json'
-        },
-      }
-    );
+    const formData = await request.formData();
+    const action = formData.get('action');
+    const amount = formData.get('amount');
 
-    const actionText = action === 'deposit' ? 'deposited' : 'withdrew';
-    toast.success(`Successfully ${actionText} $${amount}`);
-    return { success: true };
-  } catch (error: any) {
-    console.error(`${action} failed:`, error);
-    const errorMessage = error.response?.data?.message || `${action} failed. Please try again.`;
-    toast.error(errorMessage);
-    return { error: errorMessage };
-  }
-};
+    try {
+      const endpoint =
+        action === 'deposit' ? '/wallets/deposit' : '/wallets/withdraw';
+
+      await customFetch.post(
+        endpoint,
+        { amount: parseFloat(amount as string) }, // Send as JSON object
+        {
+          headers: {
+            Authorization: user.token,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const actionText = action === 'deposit' ? 'deposited' : 'withdrew';
+      toast.success(`Successfully ${actionText} $${amount}`);
+      return { success: true };
+    } catch (error: any) {
+      console.error(`${action} failed:`, error);
+      const errorMessage =
+        error.response?.data?.message || `${action} failed. Please try again.`;
+      toast.error(errorMessage);
+      return { error: errorMessage };
+    }
+  };
 
 const Wallet = () => {
   const { wallet: initialWallet } = useLoaderData() as { wallet: any };
@@ -111,7 +118,7 @@ const Wallet = () => {
     queryFn: async () => {
       const response = await customFetch.get('/wallets/my_wallet', {
         headers: {
-          'Authorization': user?.token,
+          Authorization: user?.token,
         },
       });
       return response.data;
@@ -124,12 +131,13 @@ const Wallet = () => {
   // Deposit Mutation
   const depositMutation = useMutation({
     mutationFn: async (amount: number) => {
-      const response = await customFetch.post('/wallets/deposit', 
-        { amount }, 
+      const response = await customFetch.post(
+        '/wallets/deposit',
+        { amount },
         {
           headers: {
-            'Authorization': user?.token,
-            'Content-Type': 'application/json'
+            Authorization: user?.token,
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -145,7 +153,7 @@ const Wallet = () => {
       // Optimistically update the balance
       queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
         ...old,
-        balance: (parseFloat(old?.balance || '0') + amount).toFixed(2)
+        balance: (parseFloat(old?.balance || '0') + amount).toFixed(2),
       }));
 
       return { previousWallet };
@@ -154,15 +162,22 @@ const Wallet = () => {
       // Rollback on error
       queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
       console.error('Deposit failed:', err);
-      const errorMessage = (err as any).response?.data?.message || 'Deposit failed. Please try again.';
+      const errorMessage =
+        (err as any).response?.data?.message ||
+        'Deposit failed. Please try again.';
       toast.error(errorMessage);
     },
     onSuccess: (data, amount) => {
       // Update with actual server response
-      queryClient.setQueryData(['wallet', user?.id], data.receipt ? {
-        ...wallet,
-        balance: data.receipt.wallet_balance
-      } : wallet);
+      queryClient.setQueryData(
+        ['wallet', user?.id],
+        data.receipt
+          ? {
+              ...wallet,
+              balance: data.receipt.wallet_balance,
+            }
+          : wallet
+      );
       toast.success(`Successfully deposited $${amount}`);
     },
     onSettled: () => {
@@ -171,15 +186,16 @@ const Wallet = () => {
     },
   });
 
-  // Withdraw Mutation  
+  // Withdraw Mutation
   const withdrawMutation = useMutation({
     mutationFn: async (amount: number) => {
-      const response = await customFetch.post('/wallets/withdraw', 
-        { amount }, 
+      const response = await customFetch.post(
+        '/wallets/withdraw',
+        { amount },
         {
           headers: {
-            'Authorization': user?.token,
-            'Content-Type': 'application/json'
+            Authorization: user?.token,
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -192,7 +208,7 @@ const Wallet = () => {
       // Optimistically update the balance
       queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
         ...old,
-        balance: (parseFloat(old?.balance || '0') - amount).toFixed(2)
+        balance: (parseFloat(old?.balance || '0') - amount).toFixed(2),
       }));
 
       return { previousWallet };
@@ -200,14 +216,21 @@ const Wallet = () => {
     onError: (err, amount, context) => {
       queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
       console.error('Withdrawal failed:', err);
-      const errorMessage = (err as any).response?.data?.message || 'Withdrawal failed. Please try again.';
+      const errorMessage =
+        (err as any).response?.data?.message ||
+        'Withdrawal failed. Please try again.';
       toast.error(errorMessage);
     },
     onSuccess: (data, amount) => {
-      queryClient.setQueryData(['wallet', user?.id], data.receipt ? {
-        ...wallet,
-        balance: data.receipt.wallet_balance
-      } : wallet);
+      queryClient.setQueryData(
+        ['wallet', user?.id],
+        data.receipt
+          ? {
+              ...wallet,
+              balance: data.receipt.wallet_balance,
+            }
+          : wallet
+      );
       toast.success(`Successfully withdrew $${amount}`);
     },
     onSettled: () => {
@@ -245,20 +268,21 @@ const Wallet = () => {
           <div className="lg:col-span-1">
             <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
               <h2 className="text-xl font-bold mb-6">My Wallet</h2>
-              
+
               {/* Balance Display */}
               <div className="mb-8">
                 <div className="text-4xl font-bold mb-2">
-                  $ {wallet?.balance || '0.00'}<span className="text-sm font-normal text-gray-400">USD</span>
+                  $ {wallet?.balance || '0.00'}
+                  <span className="text-sm font-normal text-gray-400">USD</span>
                 </div>
-                <div className="text-sm text-gray-400">
-                  = ₱ 0.00PHP
-                </div>
+                <div className="text-sm text-gray-400">= ₱ 0.00PHP</div>
               </div>
 
               {/* Portfolio Summary */}
               <div className="mb-6">
-                <div className="text-lg font-semibold mb-4">Current Portfolio Total:</div>
+                <div className="text-lg font-semibold mb-4">
+                  Current Portfolio Total:
+                </div>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-400">$ 0.00 USD</span>
@@ -300,14 +324,18 @@ const Wallet = () => {
               {activeTab === 'deposit' && (
                 <form onSubmit={handleDeposit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Deposit from</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Deposit from
+                    </label>
                     <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
                       <option>[MC] ****-****-****-0010</option>
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-2">Amount (USD)</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Amount (USD)
+                    </label>
                     <input
                       type="number"
                       name="amount"
@@ -333,14 +361,18 @@ const Wallet = () => {
               {activeTab === 'withdraw' && (
                 <form onSubmit={handleWithdraw} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Withdraw into</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Withdraw into
+                    </label>
                     <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
                       <option>[MC] ****-****-****-0010</option>
                     </select>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-2">Amount (USD)</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Amount (USD)
+                    </label>
                     <input
                       type="number"
                       name="amount"
@@ -368,7 +400,9 @@ const Wallet = () => {
           {/* Right Side - StocksList */}
           <div className="lg:col-span-2">
             <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
-              <h2 className="text-xl font-bold mb-6">Available Stocks for Trading</h2>
+              <h2 className="text-xl font-bold mb-6">
+                Available Stocks for Trading
+              </h2>
               <StocksList />
             </div>
           </div>

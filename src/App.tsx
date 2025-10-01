@@ -26,6 +26,7 @@ import {action as registerAction} from './pages/Signup/Signup';
 import {action as loginAction} from './pages/Login/Login';
 import { store } from './store';
 import {walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
+import { loader as receiptsLoader } from './pages/Receipts/Receipts';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,12 +69,13 @@ const router = createBrowserRouter([
             action: walletAction(store),
           },
           {
-            path: 'stocktrading/:id',
+            path: 'stocktrading',
             element: <Stocktrading />,
           },
           {
-            path: 'transactions/:id',
+            path: 'transactions',
             element: <Receipts />,
+            loader: receiptsLoader(queryClient, store),
           },
           {
             path: 'admin',

@@ -2,7 +2,7 @@ import { StocksList } from "../../components"
 
 const Stocktrading = () => {
   return (
-    <div><StocksList /></div>
+    <div>Hello there</div>
   )
 }
 export default Stocktrading
