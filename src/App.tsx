@@ -25,7 +25,7 @@ import Landing from './pages/Home/Landing';
 import {action as registerAction} from './pages/Signup/Signup';
 import {action as loginAction} from './pages/Login/Login';
 import { store } from './store';
-import {loader as walletLoader } from './pages/Wallet/Wallet';
+import {walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,6 +65,7 @@ const router = createBrowserRouter([
             path: 'wallet',
             element: <Wallet />,
             loader: walletLoader(queryClient, store),
+            action: walletAction(store),
           },
           {
             path: 'stocktrading/:id',

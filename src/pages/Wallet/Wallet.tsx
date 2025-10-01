@@ -1,10 +1,9 @@
-import { redirect } from 'react-router-dom';
+import { redirect, useLoaderData, Form } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customFetch } from '../../utils';
 import { StocksList } from '../../components';
+import { useState } from 'react';
 // import type { AppDispatch } from "../../store";
-
-const url = '/wallets/my_wallet';
 
 console.log('Wallet.tsx should be loading');
 
@@ -59,16 +58,184 @@ export const loader = (queryClient: any, store: any) => async () => {
   }
 };
 
+// Unified Wallet Action
+export const walletAction = (store: any) => async ({ request }: any) => {
+  const storeState = store.getState();
+  const user = storeState.userState?.user;
+  
+  if (!user) {
+    toast.error('You must be logged in');
+    return redirect('/login');
+  }
+
+  const formData = await request.formData();
+  const action = formData.get('action');
+  const amount = formData.get('amount');
+
+  try {
+    const endpoint = action === 'deposit' ? '/wallets/deposit' : '/wallets/withdraw';
+    
+    await customFetch.post(endpoint, 
+      { amount: parseFloat(amount as string) }, // Send as JSON object
+      {
+        headers: {
+          'Authorization': user.token,
+          'Content-Type': 'application/json'
+        },
+      }
+    );
+
+    const actionText = action === 'deposit' ? 'deposited' : 'withdrew';
+    toast.success(`Successfully ${actionText} $${amount}`);
+    return { success: true };
+  } catch (error: any) {
+    console.error(`${action} failed:`, error);
+    const errorMessage = error.response?.data?.message || `${action} failed. Please try again.`;
+    toast.error(errorMessage);
+    return { error: errorMessage };
+  }
+};
+
 const Wallet = () => {
-  console.log(wallet);
+  const { wallet } = useLoaderData() as { wallet: any };
+  const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw'>('deposit');
+
   return (
-    <div>
-      <div>
-        <h2>Your Wallet</h2>
-        <p>Available Stocks for Trading</p>
-      </div>
-      <div>
-        <StocksList />
+    <div className="min-h-screen bg-[#161420] text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Side - My Wallet */}
+          <div className="lg:col-span-1">
+            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
+              <h2 className="text-xl font-bold mb-6">My Wallet</h2>
+              
+              {/* Balance Display */}
+              <div className="mb-8">
+                <div className="text-4xl font-bold mb-2">
+                  $ {wallet?.balance || '0.00'}<span className="text-sm font-normal text-gray-400">USD</span>
+                </div>
+                <div className="text-sm text-gray-400">
+                  = ₱ 0.00PHP
+                </div>
+              </div>
+
+              {/* Portfolio Summary */}
+              <div className="mb-6">
+                <div className="text-lg font-semibold mb-4">Current Portfolio Total:</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">$ 0.00 USD</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">₱ 0.00 PHP</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Deposit/Withdraw Forms */}
+            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700 mt-6">
+              {/* Tab Buttons */}
+              <div className="flex mb-6">
+                <button
+                  onClick={() => setActiveTab('deposit')}
+                  className={`px-6 py-2 rounded-l-lg font-semibold transition-colors ${
+                    activeTab === 'deposit'
+                      ? 'bg-pink-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Deposit
+                </button>
+                <button
+                  onClick={() => setActiveTab('withdraw')}
+                  className={`px-6 py-2 rounded-r-lg font-semibold transition-colors ${
+                    activeTab === 'withdraw'
+                      ? 'bg-pink-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Withdraw
+                </button>
+              </div>
+
+              {/* Deposit Form */}
+              {activeTab === 'deposit' && (
+                <Form method="post" className="space-y-4">
+                  <input type="hidden" name="action" value="deposit" />
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Deposit from</label>
+                    <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
+                      <option>[MC] ****-****-****-0010</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Amount (USD)</label>
+                    <input
+                      type="number"
+                      name="amount"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white text-right text-2xl"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                  >
+                    Deposit
+                  </button>
+                </Form>
+              )}
+
+              {/* Withdraw Form */}
+              {activeTab === 'withdraw' && (
+                <Form method="post" className="space-y-4">
+                  <input type="hidden" name="action" value="withdraw" />
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Withdraw into</label>
+                    <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
+                      <option>[MC] ****-****-****-0010</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Amount (USD)</label>
+                    <input
+                      type="number"
+                      name="amount"
+                      step="0.01"
+                      min="0"
+                      max={wallet?.balance || 0}
+                      placeholder="0.00"
+                      className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white text-right text-2xl"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                  >
+                    Withdraw
+                  </button>
+                </Form>
+              )}
+            </div>
+          </div>
+
+          {/* Right Side - StocksList */}
+          <div className="lg:col-span-2">
+            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
+              <h2 className="text-xl font-bold mb-6">Available Stocks for Trading</h2>
+              <StocksList />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
