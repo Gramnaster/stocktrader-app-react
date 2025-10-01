@@ -23,6 +23,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Landing from './pages/Home/Landing';
 import {action as registerAction} from './pages/Signup/Signup';
 import {action as loginAction} from './pages/Login/Login';
+import { store } from './store';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,7 +93,7 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
     errorElement: <Error />,
-    action: loginAction
+    action: loginAction(store)
   },
   {
     path: '/signup',
