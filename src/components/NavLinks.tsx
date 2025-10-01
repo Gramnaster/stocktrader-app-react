@@ -13,7 +13,7 @@ const links: LinksType[] = [
   { id: 2, url: 'about', text: 'About Us' },
   { id: 3, url: 'dashboard/wallet', text: 'Wallet' },
   { id: 4, url: 'dashboard/transactions', text: 'Transactions' },
-  { id: 4, url: 'dashboard/stocktrading', text: 'Folio' },
+  { id: 5, url: 'dashboard/stocktrading', text: 'Folio' },
 ];
 
 const NavLinks = () => {

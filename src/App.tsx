@@ -27,6 +27,7 @@ import {action as loginAction} from './pages/Login/Login';
 import { store } from './store';
 import {walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
 import { loader as receiptsLoader } from './pages/Receipts/Receipts';
+import { loader as stocktradingLoader } from './pages/Stocktrading/Stocktrading';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
           {
             path: 'stocktrading',
             element: <Stocktrading />,
+            loader: stocktradingLoader(queryClient, store),
           },
           {
             path: 'transactions',

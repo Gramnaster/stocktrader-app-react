@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { customFetch } from '../utils';
+import { useNavigate } from 'react-router-dom';
 
 interface StocksType {
   id: number;
@@ -17,6 +18,7 @@ interface StocksType {
 
 const StocksList = () => {
   const [stocks, setStocks] = useState<StocksType[]>([]);
+  const navigate = useNavigate();
 
   const fetchStocks = async () => {
     try {
@@ -56,8 +58,12 @@ const StocksList = () => {
             const prevClose =
               Number(stock.current_price) - Number(stock.daily_change);
             return (
-              <tr key={stock.id}>
-                <td>{stock.name}</td>
+              <tr 
+                key={stock.id} 
+                onClick={() => navigate(`/dashboard/stocktrading/${stock.id}`)}
+                className="cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-colors"
+              >
+                <td className="hover:text-pink-400 transition-colors">{stock.name}</td>
                 <td className="text-right">{stock.current_price}</td>
                 <td className="text-right">{stock.daily_change}</td>
                 <td className="text-right">{prevClose.toFixed(2)}</td>
