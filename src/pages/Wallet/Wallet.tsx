@@ -1,8 +1,11 @@
-import { redirect, useLoaderData, Form } from 'react-router-dom';
+import { redirect, useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customFetch } from '../../utils';
 import { StocksList } from '../../components';
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../store';
 // import type { AppDispatch } from "../../store";
 
 console.log('Wallet.tsx should be loading');
@@ -97,8 +100,142 @@ export const walletAction = (store: any) => async ({ request }: any) => {
 };
 
 const Wallet = () => {
-  const { wallet } = useLoaderData() as { wallet: any };
+  const { wallet: initialWallet } = useLoaderData() as { wallet: any };
   const [activeTab, setActiveTab] = useState<'deposit' | 'withdraw'>('deposit');
+  const queryClient = useQueryClient();
+  const user = useSelector((state: RootState) => state.userState.user);
+
+  // Use React Query for live wallet data
+  const { data: wallet, isLoading } = useQuery({
+    queryKey: ['wallet', user?.id],
+    queryFn: async () => {
+      const response = await customFetch.get('/wallets/my_wallet', {
+        headers: {
+          'Authorization': user?.token,
+        },
+      });
+      return response.data;
+    },
+    initialData: initialWallet,
+    refetchOnWindowFocus: false,
+    staleTime: 0, // Always consider data stale for real-time updates
+  });
+
+  // Deposit Mutation
+  const depositMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      const response = await customFetch.post('/wallets/deposit', 
+        { amount }, 
+        {
+          headers: {
+            'Authorization': user?.token,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      return response.data;
+    },
+    onMutate: async (amount) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
+
+      // Snapshot the previous value
+      const previousWallet = queryClient.getQueryData(['wallet', user?.id]);
+
+      // Optimistically update the balance
+      queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
+        ...old,
+        balance: (parseFloat(old?.balance || '0') + amount).toFixed(2)
+      }));
+
+      return { previousWallet };
+    },
+    onError: (err, amount, context) => {
+      // Rollback on error
+      queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
+      console.error('Deposit failed:', err);
+      const errorMessage = (err as any).response?.data?.message || 'Deposit failed. Please try again.';
+      toast.error(errorMessage);
+    },
+    onSuccess: (data, amount) => {
+      // Update with actual server response
+      queryClient.setQueryData(['wallet', user?.id], data.receipt ? {
+        ...wallet,
+        balance: data.receipt.wallet_balance
+      } : wallet);
+      toast.success(`Successfully deposited $${amount}`);
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['wallet', user?.id] });
+    },
+  });
+
+  // Withdraw Mutation  
+  const withdrawMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      const response = await customFetch.post('/wallets/withdraw', 
+        { amount }, 
+        {
+          headers: {
+            'Authorization': user?.token,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+      return response.data;
+    },
+    onMutate: async (amount) => {
+      await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
+      const previousWallet = queryClient.getQueryData(['wallet', user?.id]);
+
+      // Optimistically update the balance
+      queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
+        ...old,
+        balance: (parseFloat(old?.balance || '0') - amount).toFixed(2)
+      }));
+
+      return { previousWallet };
+    },
+    onError: (err, amount, context) => {
+      queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
+      console.error('Withdrawal failed:', err);
+      const errorMessage = (err as any).response?.data?.message || 'Withdrawal failed. Please try again.';
+      toast.error(errorMessage);
+    },
+    onSuccess: (data, amount) => {
+      queryClient.setQueryData(['wallet', user?.id], data.receipt ? {
+        ...wallet,
+        balance: data.receipt.wallet_balance
+      } : wallet);
+      toast.success(`Successfully withdrew $${amount}`);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallet', user?.id] });
+    },
+  });
+
+  const handleDeposit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const amount = parseFloat(formData.get('amount') as string);
+    if (amount > 0) {
+      depositMutation.mutate(amount);
+      e.currentTarget.reset();
+    }
+  };
+
+  const handleWithdraw = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const amount = parseFloat(formData.get('amount') as string);
+    if (amount > 0 && amount <= parseFloat(wallet?.balance || '0')) {
+      withdrawMutation.mutate(amount);
+      e.currentTarget.reset();
+    } else if (amount > parseFloat(wallet?.balance || '0')) {
+      toast.error('Insufficient funds');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#161420] text-white p-6">
@@ -161,8 +298,7 @@ const Wallet = () => {
 
               {/* Deposit Form */}
               {activeTab === 'deposit' && (
-                <Form method="post" className="space-y-4">
-                  <input type="hidden" name="action" value="deposit" />
+                <form onSubmit={handleDeposit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Deposit from</label>
                     <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
@@ -185,17 +321,17 @@ const Wallet = () => {
 
                   <button
                     type="submit"
-                    className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                    disabled={depositMutation.isPending}
+                    className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                   >
-                    Deposit
+                    {depositMutation.isPending ? 'Processing...' : 'Deposit'}
                   </button>
-                </Form>
+                </form>
               )}
 
               {/* Withdraw Form */}
               {activeTab === 'withdraw' && (
-                <Form method="post" className="space-y-4">
-                  <input type="hidden" name="action" value="withdraw" />
+                <form onSubmit={handleWithdraw} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Withdraw into</label>
                     <select className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white">
@@ -219,11 +355,12 @@ const Wallet = () => {
 
                   <button
                     type="submit"
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                    disabled={withdrawMutation.isPending}
+                    className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                   >
-                    Withdraw
+                    {withdrawMutation.isPending ? 'Processing...' : 'Withdraw'}
                   </button>
-                </Form>
+                </form>
               )}
             </div>
           </div>
