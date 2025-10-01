@@ -3,15 +3,17 @@ import {
   Companies,
   DashboardAdmin,
   DashboardUser,
+  ReceiptsAdmin,
+  TradersAdmin,
   Home,
   Login,
   Receipts,
   Signup,
   Stocktrading,
-  Traders,
   Wallet,
   Error,
   About,
+
   // NotFound
 } from './pages/index';
 
@@ -22,10 +24,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // Loaders
 import Landing from './pages/Home/Landing';
-import {action as registerAction} from './pages/Signup/Signup';
-import {action as loginAction} from './pages/Login/Login';
+import { action as registerAction } from './pages/Signup/Signup';
+import { action as loginAction } from './pages/Login/Login';
 import { store } from './store';
-import {walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
+import { walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
 import { loader as receiptsLoader } from './pages/Receipts/Receipts';
 import { loader as stocktradingLoader } from './pages/Stocktrading/Stocktrading';
 
@@ -85,11 +87,11 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <Traders />,
+                element: <TradersAdmin />,
               },
               {
                 path: 'transactions',
-                element: <Receipts />,
+                element: <ReceiptsAdmin />,
               },
             ],
           },
@@ -101,13 +103,13 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
     errorElement: <Error />,
-    action: loginAction(store)
+    action: loginAction(store),
   },
   {
     path: '/signup',
     element: <Signup />,
     errorElement: <Error />,
-    action: registerAction
+    action: registerAction,
   },
   {
     path: '*',

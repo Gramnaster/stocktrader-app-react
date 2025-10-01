@@ -14,6 +14,8 @@ const links: LinksType[] = [
   { id: 3, url: 'dashboard/wallet', text: 'Wallet' },
   { id: 4, url: 'dashboard/transactions', text: 'Transactions' },
   { id: 5, url: 'dashboard/stocktrading', text: 'Folio' },
+  { id: 6, url: 'dashboard/admin', text: 'Traders' },
+  { id: 7, url: 'dashboard/admin/transactions', text: 'User Transactions' },
 ];
 
 const NavLinks = () => {
@@ -30,6 +32,11 @@ const NavLinks = () => {
           !user
         )
           return null;
+
+        if ((url === 'dashboard/admin' ||
+            url === 'dashboard/admin/transactions') &&
+          (!user || user.user_role === 'admin')
+        ) return null;
         
         // Hide "About Us" when user is logged in
         if (url === 'about' && user) return null;

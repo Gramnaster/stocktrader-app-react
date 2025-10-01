@@ -6,7 +6,8 @@ interface User {
   first_name: string;
   id: number;
   last_name: string;
-  user_role: string;
+  user_role: 'trader' | 'admin';
+  user_status: 'rejected' | 'pending' | 'approved';
   jti: string;
   token: string;
 }
