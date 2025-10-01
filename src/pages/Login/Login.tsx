@@ -34,7 +34,7 @@ export const action =
       console.log(response);
 
       // Data and Token extraction
-      const token = response.headers.authorization?.replace('Bearer ', '');
+      const token = response.headers.authorization; // Keep the full "Bearer <token>" format
       const userData = response.data.data;
 
       store.dispatch(loginUser({ user: userData, token }));
@@ -63,7 +63,7 @@ const Login = () => {
       const response = await customFetch.post('/users/login', formData);
       
       // Extract token and user data (same as form submission)
-      const token = response.headers.authorization?.replace('Bearer ', '');
+      const token = response.headers.authorization; // Keep the full "Bearer <token>" format
       const userData = response.data.data;
 
       dispatch(loginUser({ user: userData, token }));

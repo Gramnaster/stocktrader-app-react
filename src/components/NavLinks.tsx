@@ -8,9 +8,10 @@ interface LinksType {
   text: string;
 }
 const links: LinksType[] = [
-  { id: 0, url: '/', text: 'Home' },
+  { id: 0, url: 'dashboard', text: 'Dashboard' },
   { id: 1, url: 'companies', text: 'Companies' },
   { id: 2, url: 'about', text: 'About Us' },
+  { id: 3, url: 'dashboard/wallet', text: 'Wallet' },
 ];
 
 const NavLinks = () => {
@@ -19,7 +20,7 @@ const NavLinks = () => {
     <>
       {links.map((link) => {
         const { id, url, text } = link;
-        if (url === 'companies' && !user) return null;
+        if ((url === 'companies' || url === 'dashboard' || url === 'wallet') && !user) return null;
         return (
           <li key={id}>
             <NavLink to={url} className="capitalize">

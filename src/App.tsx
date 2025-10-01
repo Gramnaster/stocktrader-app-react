@@ -18,12 +18,14 @@ import {
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { Provider } from 'react-redux';
 
 // Loaders
 import Landing from './pages/Home/Landing';
 import {action as registerAction} from './pages/Signup/Signup';
 import {action as loginAction} from './pages/Login/Login';
 import { store } from './store';
+import {loader as walletLoader } from './pages/Wallet/Wallet';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,8 +62,9 @@ const router = createBrowserRouter([
         // loader: landingLoader,
         children: [
           {
-            path: 'wallet/:id',
+            path: 'wallet',
             element: <Wallet />,
+            loader: walletLoader(queryClient, store),
           },
           {
             path: 'stocktrading/:id',
