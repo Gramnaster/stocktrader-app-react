@@ -9,23 +9,23 @@ import type { RootState } from '../../store';
 
 interface Stock {
   id: number;
-  company_name?: string;  // New field from backend
-  name?: string;          // Keep for backward compatibility
+  company_name?: string;
+  name?: string;        
   ticker: string;
   current_price: number | string;
   daily_change?: number;
   percent_daily_change?: number;
   market_cap: number | string;
-  currency?: string;      // New field from backend
-  logo_url?: string;      // Logo URL field
+  currency?: string;   
+  logo_url?: string;     
 }
 
 interface PortfolioItem {
-  id: [number, number];  // Array of [user_id, stock_id]
+  id: [number, number]; 
   user_id: number;
   stock_id: number;
   quantity: string;
-  current_market_value: string;  // Actual field from API
+  current_market_value: string; 
   created_at: string;
   updated_at: string;
   stock: Stock;
@@ -88,21 +88,18 @@ export const loader = (queryClient: any, store: any) => async ({ params }: any) 
   };
 
   try {
-    // Always load wallet, portfolio, and all stocks
     const [wallet, portfolio, allStocks] = await Promise.all([
       queryClient.ensureQueryData(walletQuery),
       queryClient.ensureQueryData(portfolioQuery),
       queryClient.ensureQueryData(allStocksQuery),
     ]);
 
-    // Only load specific stock if stockId is provided
     let stock = {};
     if (stockId && !isNaN(parseInt(stockId))) {
       try {
         stock = await queryClient.ensureQueryData(stockQuery);
       } catch (stockError) {
         console.warn(`Failed to load specific stock ${stockId}:`, stockError);
-        // Don't fail the entire page if just the specific stock fails
       }
     }
 

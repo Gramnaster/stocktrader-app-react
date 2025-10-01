@@ -1,6 +1,10 @@
+import { Outlet } from 'react-router-dom';
+
 const DashboardAdmin = () => {
   return (
-    <div>DashboardAdmin</div>
-  )
-}
-export default DashboardAdmin
+    <div>
+      <Outlet />
+    </div>
+  );
+};
+export default DashboardAdmin;

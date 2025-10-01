@@ -111,7 +111,6 @@ const Wallet = () => {
   const queryClient = useQueryClient();
   const user = useSelector((state: RootState) => state.userState.user);
 
-  // Use React Query for live wallet data
   const { data: wallet } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
@@ -124,7 +123,7 @@ const Wallet = () => {
     },
     initialData: initialWallet,
     refetchOnWindowFocus: false,
-    staleTime: 0, // Always consider data stale for real-time updates
+    staleTime: 0,
   });
 
   // Deposit Mutation
@@ -143,13 +142,10 @@ const Wallet = () => {
       return response.data;
     },
     onMutate: async (amount) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
 
-      // Snapshot the previous value
       const previousWallet = queryClient.getQueryData(['wallet', user?.id]);
 
-      // Optimistically update the balance
       queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
         ...old,
         balance: (parseFloat(old?.balance || '0') + amount).toFixed(2),
@@ -158,7 +154,6 @@ const Wallet = () => {
       return { previousWallet };
     },
     onError: (err, _amount, context) => {
-      // Rollback on error
       queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
       console.error('Deposit failed:', err);
       const errorMessage =
@@ -167,7 +162,6 @@ const Wallet = () => {
       toast.error(errorMessage);
     },
     onSuccess: (data, amount) => {
-      // Update with actual server response
       queryClient.setQueryData(
         ['wallet', user?.id],
         data.receipt
@@ -180,7 +174,6 @@ const Wallet = () => {
       toast.success(`Successfully deposited $${amount}`);
     },
     onSettled: () => {
-      // Always refetch after error or success to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['wallet', user?.id] });
     },
   });
@@ -204,7 +197,6 @@ const Wallet = () => {
       await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
       const previousWallet = queryClient.getQueryData(['wallet', user?.id]);
 
-      // Optimistically update the balance
       queryClient.setQueryData(['wallet', user?.id], (old: any) => ({
         ...old,
         balance: (parseFloat(old?.balance || '0') - amount).toFixed(2),
