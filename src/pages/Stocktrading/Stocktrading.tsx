@@ -1,7 +1,7 @@
 import { redirect, useLoaderData, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customFetch } from '../../utils';
-import { StocksList } from '../../components';
+import { StocksList, Portfolio } from '../../components';
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -17,13 +17,15 @@ interface Stock {
   percent_daily_change?: number;
   market_cap: number | string;
   currency?: string;      // New field from backend
+  logo_url?: string;      // Logo URL field
 }
 
-interface Portfolio {
+interface PortfolioItem {
+  id: [number, number];  // Array of [user_id, stock_id]
   user_id: number;
   stock_id: number;
   quantity: string;
-  portfolio_value?: string;  // Make optional in case backend doesn't calculate it yet
+  current_market_value: string;  // Actual field from API
   created_at: string;
   updated_at: string;
   stock: Stock;
@@ -104,7 +106,7 @@ export const loader = (queryClient: any, store: any) => async ({ params }: any) 
 const Stocktrading = () => {
   const { wallet: initialWallet, portfolio: initialPortfolio, stock: initialStock, allStocks: initialAllStocks } = useLoaderData() as {
     wallet: WalletData;
-    portfolio: Portfolio[];
+    portfolio: PortfolioItem[];
     stock: Stock;
     allStocks: Stock[];
   };
@@ -165,18 +167,16 @@ const Stocktrading = () => {
     initialData: initialAllStocks,
     refetchOnWindowFocus: false,
     select: (data) => {
-      // Sort stocks alphabetically by company name or name
+      // Sort stocks alphabetically by ticker
       return [...(data || [])].sort((a, b) => {
-        const nameA = a.company_name || a.name || '';
-        const nameB = b.company_name || b.name || '';
-        return nameA.localeCompare(nameB);
+        return a.ticker.localeCompare(b.ticker);
       });
     },
   });
 
   // Get selected stock for trading (can be different from URL stock)
   const selectedStock = allStocks.find((s: Stock) => s.id === selectedStockId) || stock || null;
-  const selectedStockInPortfolio = portfolio.find((item: Portfolio) => item.stock.id === selectedStockId);
+  const selectedStockInPortfolio = portfolio.find((item: PortfolioItem) => item.stock.id === selectedStockId);
 
   // Handle stock selection change
   const handleStockSelection = (stockId: string) => {
@@ -421,35 +421,70 @@ const Stocktrading = () => {
                 <label className="block text-sm font-medium mb-2">
                   {activeTab === 'buy' ? 'Select Stock to Buy' : 'Select Stock to Sell'}
                 </label>
-                <select 
-                  value={selectedStockId}
-                  onChange={(e) => handleStockSelection(e.target.value)}
-                  className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white"
-                >
-                  {activeTab === 'buy' ? (
-                    // For buying: show all available stocks
-                    allStocks && allStocks.length > 0 ? (
-                      allStocks.map((stockOption: Stock) => (
-                        <option key={stockOption.id} value={stockOption.id}>
-                          [{stockOption.ticker}] {stockOption.company_name || stockOption.name}
-                        </option>
-                      ))
+                <div className="relative">
+                  <select 
+                    value={selectedStockId}
+                    onChange={(e) => handleStockSelection(e.target.value)}
+                    className="w-full bg-[#2a2740] border border-gray-600 rounded-lg p-3 text-white appearance-none cursor-pointer"
+                  >
+                    {activeTab === 'buy' ? (
+                      // For buying: show all available stocks
+                      allStocks && allStocks.length > 0 ? (
+                        allStocks.map((stockOption: Stock) => (
+                          <option key={stockOption.id} value={stockOption.id}>
+                            {stockOption.ticker} - {stockOption.company_name || stockOption.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">Loading stocks...</option>
+                      )
                     ) : (
-                      <option value="">Loading stocks...</option>
-                    )
-                  ) : (
-                    // For selling: show only stocks in portfolio
-                    portfolio && portfolio.length > 0 ? (
-                      portfolio.map((portfolioItem: Portfolio) => (
-                        <option key={portfolioItem.stock.id} value={portfolioItem.stock.id}>
-                          [{portfolioItem.stock.ticker}] {portfolioItem.stock.company_name || portfolioItem.stock.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="">No stocks in portfolio</option>
-                    )
-                  )}
-                </select>
+                      // For selling: show only stocks in portfolio
+                      portfolio && portfolio.length > 0 ? (
+                        portfolio.map((portfolioItem: PortfolioItem) => (
+                          <option key={portfolioItem.stock.id} value={portfolioItem.stock.id}>
+                            {portfolioItem.stock.ticker} - {portfolioItem.stock.company_name || portfolioItem.stock.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No stocks in portfolio</option>
+                      )
+                    )}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* Display selected stock with logo */}
+                {selectedStock && (
+                  <div className="mt-3 p-3 bg-[#1e1b2e] rounded-lg border border-gray-600">
+                    <div className="flex items-center space-x-3">
+                      {selectedStock.logo_url ? (
+                        <img 
+                          src={selectedStock.logo_url} 
+                          alt={`${selectedStock.ticker} logo`}
+                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                          <span className="text-sm font-bold text-gray-300">
+                            {selectedStock.ticker?.charAt(0) || '?'}
+                          </span>
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-bold text-lg">{selectedStock.ticker}</div>
+                        <div className="text-sm text-gray-400">{selectedStock.company_name || selectedStock.name}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Current Price */}
@@ -580,68 +615,7 @@ const Stocktrading = () => {
           {/* Right Side - Portfolio & Available Stocks */}
           <div className="lg:col-span-2">
             {/* Portfolio Section */}
-            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700 mb-6">
-              <h2 className="text-xl font-bold mb-6">My Portfolio</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-700">
-                      <th className="text-left p-4 font-medium text-gray-300">Stock</th>
-                      <th className="text-right p-4 font-medium text-gray-300">Quantity</th>
-                      <th className="text-right p-4 font-medium text-gray-300">Current Price</th>
-                      <th className="text-right p-4 font-medium text-gray-300">Portfolio Value</th>
-                      <th className="text-right p-4 font-medium text-gray-300">Gain/Loss</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {portfolio.length > 0 ? (
-                      portfolio.map((item: Portfolio, index: number) => (
-                        <tr 
-                          key={`${item.user_id}-${item.stock_id}`} 
-                          className={`border-b border-gray-800 hover:bg-[#2a2740] transition-colors ${
-                            index % 2 === 0 ? 'bg-[#1e1b2e]' : 'bg-[#252238]'
-                          }`}
-                        >
-                          <td className="p-4">
-                            <div>
-                              <div className="font-medium">{item.stock.company_name || item.stock.name}</div>
-                              <div className="text-sm text-gray-400">{item.stock.ticker}</div>
-                            </div>
-                          </td>
-                          <td className="p-4 text-right">{parseInt(item.quantity).toLocaleString()}</td>
-                          <td className="p-4 text-right">
-                            ${(() => {
-                              const currentPrice = typeof item.stock.current_price === 'string' 
-                                ? parseFloat(item.stock.current_price) 
-                                : item.stock.current_price;
-                              return isNaN(currentPrice) ? 'N/A' : currentPrice.toFixed(2);
-                            })()}
-                          </td>
-                          <td className="p-4 text-right">
-                            ${(() => {
-                              if (!item.portfolio_value) return 'N/A';
-                              const portfolioValue = typeof item.portfolio_value === 'string' 
-                                ? parseFloat(item.portfolio_value) 
-                                : item.portfolio_value;
-                              return isNaN(portfolioValue) ? 'N/A' : portfolioValue.toFixed(2);
-                            })()}
-                          </td>
-                          <td className="p-4 text-right font-medium text-gray-400">
-                            N/A
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="p-8 text-center text-gray-400">
-                          No stocks in portfolio
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <Portfolio portfolio={portfolio} />
 
             {/* Available Stocks */}
             <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">

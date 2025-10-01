@@ -21,7 +21,13 @@ interface Transaction {
     first_name: string;
     last_name: string;
   };
-  stock: any;
+  stock: {
+    id: number;
+    ticker: string;
+    company_name?: string;
+    name?: string;  // Fallback
+    logo_url?: string;
+  } | null;
 }
 
 export const loader = (queryClient: any, store: any) => async () => {
@@ -107,7 +113,8 @@ const Receipts = () => {
 
   const getCompanyDisplay = (transaction: Transaction) => {
     if (transaction.stock) {
-      return `[${transaction.stock.ticker}] ${transaction.stock.name}`;
+      const companyName = transaction.stock.company_name || transaction.stock.name || 'Unknown Company';
+      return `[${transaction.stock.ticker}] ${companyName}`;
     }
     return '-';
   };
@@ -167,8 +174,28 @@ const Receipts = () => {
                           {getTransactionTypeDisplay(transaction.transaction_type)}
                         </span>
                       </td>
-                      <td className="p-4 text-white">
-                        {getCompanyDisplay(transaction)}
+                      <td className="p-4">
+                        <div className="flex items-center space-x-3">
+                          {transaction.stock?.logo_url ? (
+                            <img 
+                              src={transaction.stock.logo_url} 
+                              alt={`${transaction.stock.ticker} logo`}
+                              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-bold text-gray-300">
+                                {transaction.stock?.ticker?.charAt(0) || '?'}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-white">
+                            {getCompanyDisplay(transaction)}
+                          </span>
+                        </div>
                       </td>
                       <td className="p-4 text-right text-white">
                         {transaction.quantity && transaction.quantity !== '0.0' 
