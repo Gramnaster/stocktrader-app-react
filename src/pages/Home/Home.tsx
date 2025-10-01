@@ -1,6 +1,6 @@
 import { Outlet, useNavigation } from 'react-router-dom';
 import { Navbar, Loading } from '../../components';
-import Landing from './Landing';
+// import Landing from './Landing';
 
 const Home = () => {
   const navigation = useNavigation();

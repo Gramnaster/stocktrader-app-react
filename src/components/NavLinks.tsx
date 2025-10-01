@@ -19,7 +19,7 @@ const NavLinks = () => {
     <>
       {links.map((link) => {
         const { id, url, text } = link;
-        if ((url === 'companies')&& !user) return null
+        if (url === 'companies' && !user) return null;
         return (
           <li key={id}>
             <NavLink to={url} className="capitalize">

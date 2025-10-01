@@ -21,6 +21,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 // Loaders
 import Landing from './pages/Home/Landing';
+import {action as registerAction} from './pages/Signup/Signup';
+import {action as loginAction} from './pages/Login/Login';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -90,11 +92,13 @@ const router = createBrowserRouter([
     path: '/login',
     element: <Login />,
     errorElement: <Error />,
+    action: loginAction
   },
   {
     path: '/signup',
     element: <Signup />,
     errorElement: <Error />,
+    action: registerAction
   },
   {
     path: '*',

@@ -7,3 +7,5 @@ export const customFetch = axios.create({
 });
 
 customFetch.defaults.headers.common['Accept'] = '*/*';
+// Temporarily comment out Content-Type to avoid preflight
+// customFetch.defaults.headers.common['Content-Type'] = 'application/json';
