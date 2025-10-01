@@ -1,7 +1,6 @@
 import { redirect, useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customFetch } from '../../utils';
-import { StocksList } from '../../components';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
@@ -113,7 +112,7 @@ const Wallet = () => {
   const user = useSelector((state: RootState) => state.userState.user);
 
   // Use React Query for live wallet data
-  const { data: wallet, isLoading } = useQuery({
+  const { data: wallet } = useQuery({
     queryKey: ['wallet', user?.id],
     queryFn: async () => {
       const response = await customFetch.get('/wallets/my_wallet', {
@@ -158,7 +157,7 @@ const Wallet = () => {
 
       return { previousWallet };
     },
-    onError: (err, amount, context) => {
+    onError: (err, _amount, context) => {
       // Rollback on error
       queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
       console.error('Deposit failed:', err);
@@ -213,7 +212,7 @@ const Wallet = () => {
 
       return { previousWallet };
     },
-    onError: (err, amount, context) => {
+    onError: (err, _amount, context) => {
       queryClient.setQueryData(['wallet', user?.id], context?.previousWallet);
       console.error('Withdrawal failed:', err);
       const errorMessage =
@@ -263,7 +262,7 @@ const Wallet = () => {
   return (
     <div className="min-h-screen bg-[#161420] text-white p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left Side - My Wallet */}
           <div className="lg:col-span-1">
             <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
@@ -293,9 +292,13 @@ const Wallet = () => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Deposit/Withdraw Forms */}
-            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700 mt-6">
+          {/* Right Side - Deposit/Withdraw Forms */}
+          <div className="lg:col-span-1">
+            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
+              <h2 className="text-xl font-bold mb-6">Manage Funds</h2>
+              
               {/* Tab Buttons */}
               <div className="flex mb-6">
                 <button
@@ -394,16 +397,6 @@ const Wallet = () => {
                   </button>
                 </form>
               )}
-            </div>
-          </div>
-
-          {/* Right Side - StocksList */}
-          <div className="lg:col-span-2">
-            <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700">
-              <h2 className="text-xl font-bold mb-6">
-                Available Stocks for Trading
-              </h2>
-              <StocksList />
             </div>
           </div>
         </div>
