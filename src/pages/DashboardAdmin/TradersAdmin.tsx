@@ -44,7 +44,7 @@ export const loader = (queryClient: any, store: any) => async () => {
   const user = storeState.userState?.user;
 
   if (!user || user.user_role !== 'admin') {
-    toast.warn('You must be an admin to view this page');
+    toast.warn('There must be something wrong. Please refresh the page.');
     return redirect('/dashboard');
   }
 
@@ -71,7 +71,7 @@ export const loader = (queryClient: any, store: any) => async () => {
 };
 
 const TradersAdmin = () => {
-  const [activeTab, setActiveTab] = useState<'pending' | 'current'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'current' | 'rejected'>('pending');
   const [searchWord, setSearchWord] = useState('');
 
   const { users: initialUsers } = useLoaderData() as {
@@ -179,12 +179,10 @@ const TradersAdmin = () => {
 
       if (activeTab === 'pending') {
         return matchesSearch && trader.user_status === 'pending';
+      } else if (activeTab === 'current') {
+        return matchesSearch && trader.user_status === 'approved';
       } else {
-        return (
-          matchesSearch &&
-          (trader.user_status === 'approved' ||
-            trader.user_status === 'rejected')
-        );
+        return matchesSearch && trader.user_status === 'rejected';
       }
     })
     .sort(
@@ -216,6 +214,16 @@ const TradersAdmin = () => {
             }`}
           >
             Current Traders
+          </button>
+          <button
+            onClick={() => setActiveTab('rejected')}
+            className={`pb-4 px-2 font-semibold text-lg transition-colors ${
+              activeTab === 'rejected'
+                ? 'text-pink-500 border-b-2 border-pink-500'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            Rejected Traders
           </button>
         </div>
 
@@ -269,7 +277,7 @@ const TradersAdmin = () => {
               <thead>
                 <tr className="border-b border-gray-700">
                   <th className="text-left p-4 text-xs font-extralight text-gray-300">
-                    Full Name
+                    Email
                   </th>
                   <th className="text-center p-4 text-xs font-extralight text-gray-300">
                     {activeTab === 'pending'
@@ -282,7 +290,7 @@ const TradersAdmin = () => {
                       : 'Pin Code'}
                   </th>
                   <th className="text-center p-4 text-xs font-extralight text-gray-300">
-                    {activeTab === 'pending' ? 'Country' : 'Country'}
+                    Country
                   </th>
                   <th className={`p-4 text-xs font-extralight text-gray-300 ${
                     activeTab === 'pending' ? 'text-center' : 'text-right'
@@ -303,21 +311,21 @@ const TradersAdmin = () => {
                         index % 2 === 0 ? 'bg-[#1e1b2e]' : 'bg-[#252238]'
                       }`}
                     >
-                      <td className="p-4 text-left">
-                        {trader.first_name} {trader.last_name}
+                      <td className="p-4 text-xs  text-left">
+                        {trader.email}
                       </td>
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-xs  text-center">
                         {activeTab === 'pending'
                           ? formatDate(trader.created_at)
                           : formatDate(trader.date_of_birth)}
                       </td>
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-xs  text-center">
                         {activeTab === 'pending'
                           ? formatDate(trader.date_of_birth)
                           : trader.zip_code}
                       </td>
-                      <td className="p-4 text-center">{trader.country.code}</td>
-                      <td className={`p-4 ${activeTab === 'pending' ? 'text-center' : 'text-right'}`}>
+                      <td className="p-4 text-xs  text-center">{trader.country.code}</td>
+                      <td className={`p-4 text-xs  ${activeTab === 'pending' ? 'text-center' : 'text-right'}`}>
                         {activeTab === 'pending' ? (
                           trader.mobile_no
                         ) : (
@@ -330,15 +338,15 @@ const TradersAdmin = () => {
                         )}
                       </td>
                       <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex items-center text-xs justify-center gap-2">
                           {activeTab === 'pending' ? (
                             <>
                               <button
                                 onClick={() => handleReject(trader.id)}
-                                disabled={rejectMutation.isPending}
+                                disabled={rejectMutation.isPending || trader.user_status === 'rejected'}
                                 className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
                                   trader.user_status === 'rejected'
-                                    ? 'bg-red-500 text-white'
+                                    ? 'bg-red-500 text-white cursor-default'
                                     : 'bg-transparent text-red-500 border border-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50'
                                 }`}
                               >
@@ -346,7 +354,7 @@ const TradersAdmin = () => {
                               </button>
                               <button
                                 disabled
-                                className={`px-4 py-1 rounded-full text-sm font-medium ${
+                                className={`px-4 py-1 rounded-full text-sm font-medium cursor-default ${
                                   trader.user_status === 'pending'
                                     ? 'bg-yellow-500 text-black'
                                     : 'bg-transparent text-yellow-500 border border-yellow-500'
@@ -356,20 +364,24 @@ const TradersAdmin = () => {
                               </button>
                               <button
                                 onClick={() => handleApprove(trader.id)}
-                                disabled={approveMutation.isPending}
+                                disabled={approveMutation.isPending || trader.user_status === 'approved'}
                                 className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
                                   trader.user_status === 'approved'
-                                    ? 'bg-green-500 text-white'
+                                    ? 'bg-green-500 text-white cursor-default'
                                     : 'bg-transparent text-green-500 border border-green-500 hover:bg-green-500 hover:text-white disabled:opacity-50'
                                 }`}
                               >
                                 Approved
                               </button>
                             </>
-                          ) : (
+                          ) : activeTab === 'current' ? (
                             <button className="px-6 py-1 rounded text-sm font-medium hover:opacity-80 transition-opacity">
                               Transactions
                             </button>
+                          ) : (
+                            <span className="text-sm font-medium text-red-500">
+                              Rejected
+                            </span>
                           )}
                         </div>
                       </td>

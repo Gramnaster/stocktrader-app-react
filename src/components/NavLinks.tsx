@@ -29,13 +29,13 @@ const NavLinks = () => {
             url === 'dashboard' ||
             url === 'dashboard/wallet' ||
             url === 'dashboard/transactions') &&
-          !user
+          (!user || user.user_role === 'admin')
         )
           return null;
 
         if ((url === 'dashboard/admin' ||
             url === 'dashboard/admin/transactions') &&
-          (!user || user.user_role === 'admin')
+          (!user || user.user_role !== 'admin')
         ) return null;
         
         // Hide "About Us" when user is logged in

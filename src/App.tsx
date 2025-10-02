@@ -84,22 +84,22 @@ const router = createBrowserRouter([
             element: <Receipts />,
             loader: receiptsLoader(queryClient, store),
           },
+        ],
+      },
+      {
+        path: 'admin',
+        element: <DashboardAdmin />,
+        loader: adminLoader(queryClient, store),
+        children: [
           {
-            path: 'admin',
-            element: <DashboardAdmin />,
-            loader: adminLoader(queryClient, store),
-            children: [
-              {
-                index: true,
-                element: <TradersAdmin />,
-                loader: traderReceiptsLoader(queryClient, store),
-              },
-              {
-                path: 'transactions',
-                element: <ReceiptsAdmin />,
-                loader: adminReceiptsLoader(queryClient, store)
-              },
-            ],
+            index: true,
+            element: <TradersAdmin />,
+            loader: traderReceiptsLoader(queryClient, store),
+          },
+          {
+            path: 'transactions',
+            element: <ReceiptsAdmin />,
+            loader: adminReceiptsLoader(queryClient, store),
           },
         ],
       },
