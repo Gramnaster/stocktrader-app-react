@@ -86,56 +86,55 @@ const StocksList = () => {
         <table className="table w-full">
           <thead>
             <tr>
-              <th>Name</th>
-              <th className="text-right">Current Price</th>
-              <th className="text-right">Daily Change</th>
-              <th className="text-right">Previous Close</th>
-              <th className="text-right">Market Cap</th>
+              <th className="text-left p-4 text-xs font-extralight text-gray-300">Name</th>
+              <th className="text-right p-4 text-xs font-extralight text-gray-300">Current Price</th>
+              <th className="text-right p-4 text-xs font-extralight text-gray-300">Daily Change</th>
+              <th className="text-right p-4 text-xs font-extralight text-gray-300">Previous Close</th>
+              <th className="text-right p-4 text-xs font-extralight text-gray-300">Market Cap</th>
             </tr>
           </thead>
           <tbody>
             {filteredAndSortedStocks.length > 0 ? (
               filteredAndSortedStocks.map((stock) => {
-                // Calculate Previous Close: current_price - daily_change
-                const prevClose =
-                  Number(stock.current_price) - Number(stock.daily_change);
+                const prevClose = Number(stock.current_price) - Number(stock.daily_change);
                 return (
-                  <tr 
-                    key={stock.id} 
+                  <tr
+                    key={stock.id}
                     onClick={() => navigate(`/dashboard/stocktrading/${stock.id}`)}
                     className="cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-colors"
                   >
-                    <td className="hover:text-pink-400 transition-colors">
+                    <td className="hover:text-pink-400 transition-colors p-4 text-xs font-normal">
                       <div className="flex items-center gap-2">
                         {stock.logo_url ? (
                           <img
                             src={stock.logo_url}
-                            alt={stock.name}
-                            className="w-8 h-8 rounded object-cover"
+                            alt={stock.ticker}
+                            className="w-6 h-6 rounded object-cover"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded bg-gray-700 flex items-center justify-center text-xs">
+                          <div className="w-6 h-6 rounded bg-gray-700 flex items-center justify-center text-xs">
                             {stock.ticker.charAt(0)}
                           </div>
                         )}
-                        <span>{stock.name}</span>
+                        <span className="font-bold">[{stock.ticker}]</span>
+                        <span className="text-gray-400">{stock.name}</span>
                       </div>
                     </td>
-                    <td className="text-right">{stock.current_price}</td>
-                    <td className="text-right">{stock.daily_change}</td>
-                    <td className="text-right">{prevClose.toFixed(2)}</td>
-                    <td className="text-right">
-                      {Number(stock.market_cap).toLocaleString(undefined, {
+                    <td className="text-right p-4 text-xs font-normal">{stock.current_price}</td>
+                    <td className="text-right p-4 text-xs font-normal">{stock.daily_change}</td>
+                    <td className="text-right p-4 text-xs font-normal">{prevClose.toFixed(2)}</td>
+                    <td className="text-right p-4 text-xs font-normal">
+                      {(Number(stock.market_cap) / 1_000_000_000).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      })}B
                     </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={5} className="text-center text-gray-400 py-8">
+                <td colSpan={5} className="text-center text-gray-400 py-8 text-xs font-normal">
                   No stocks found
                 </td>
               </tr>
@@ -146,4 +145,5 @@ const StocksList = () => {
     </div>
   );
 };
+
 export default StocksList;

@@ -28,16 +28,19 @@ const NavLinks = () => {
           (url === 'companies' ||
             url === 'dashboard' ||
             url === 'dashboard/wallet' ||
-            url === 'dashboard/transactions') &&
+            url === 'dashboard/transactions' ||
+            url === 'dashboard/stocktrading') &&
           (!user || user.user_role === 'admin')
         )
           return null;
 
-        if ((url === 'dashboard/admin' ||
+        if (
+          (url === 'dashboard/admin' ||
             url === 'dashboard/admin/transactions') &&
           (!user || user.user_role !== 'admin')
-        ) return null;
-        
+        )
+          return null;
+
         // Hide "About Us" when user is logged in
         if (url === 'about' && user) return null;
         return (

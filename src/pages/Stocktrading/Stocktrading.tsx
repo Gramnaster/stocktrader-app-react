@@ -417,32 +417,31 @@ const Stocktrading = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Side - Trading Interface */}
           <div className="lg:col-span-1">
-            {/* Tab Buttons */}
-            <div className="flex mb-6">
-              <button
-                onClick={() => setActiveTab('buy')}
-                className={`px-6 py-2 rounded-l-lg font-semibold transition-colors ${
-                  activeTab === 'buy'
-                    ? 'bg-pink-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Buy
-              </button>
-              <button
-                onClick={() => setActiveTab('sell')}
-                className={`px-6 py-2 rounded-r-lg font-semibold transition-colors ${
-                  activeTab === 'sell'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Sell
-              </button>
-            </div>
-
             {/* Trading Form */}
             <div className="bg-[#1e1b2e] rounded-lg p-6 border border-gray-700 mb-6">
+              {/* Tab Buttons INSIDE the container */}
+              <div className="flex mb-6">
+                <button
+                  onClick={() => setActiveTab('buy')}
+                  className={`px-6 py-2 rounded-l-lg font-semibold transition-colors ${
+                    activeTab === 'buy'
+                      ? 'bg-pink-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Buy
+                </button>
+                <button
+                  onClick={() => setActiveTab('sell')}
+                  className={`px-6 py-2 rounded-r-lg font-semibold transition-colors ${
+                    activeTab === 'sell'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  Sell
+                </button>
+              </div>
               <h3 className="text-lg font-semibold mb-4">
                 {activeTab === 'buy' ? 'Buying from' : 'Selling from'}
               </h3>
