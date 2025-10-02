@@ -30,6 +30,9 @@ import { store } from './store';
 import { walletAction, loader as walletLoader } from './pages/Wallet/Wallet';
 import { loader as receiptsLoader } from './pages/Receipts/Receipts';
 import { loader as stocktradingLoader } from './pages/Stocktrading/Stocktrading';
+import { loader as adminLoader } from './pages/DashboardAdmin/DashboardAdmin';
+import { loader as adminReceiptsLoader } from './pages/DashboardAdmin/ReceiptsAdmin';
+import { loader as traderReceiptsLoader } from './pages/DashboardAdmin/TradersAdmin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,14 +87,17 @@ const router = createBrowserRouter([
           {
             path: 'admin',
             element: <DashboardAdmin />,
+            loader: adminLoader(queryClient, store),
             children: [
               {
                 index: true,
                 element: <TradersAdmin />,
+                loader: traderReceiptsLoader(queryClient, store),
               },
               {
                 path: 'transactions',
                 element: <ReceiptsAdmin />,
+                loader: adminReceiptsLoader(queryClient, store)
               },
             ],
           },

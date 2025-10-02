@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../store';
 
-interface Transaction {
+export interface Transaction {
   id: number;
   user_id: number;
   stock_id: number | null;
