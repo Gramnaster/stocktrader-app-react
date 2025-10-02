@@ -14,8 +14,8 @@ const links: LinksType[] = [
   { id: 3, url: 'dashboard/wallet', text: 'Wallet' },
   { id: 4, url: 'dashboard/transactions', text: 'Transactions' },
   { id: 5, url: 'dashboard/stocktrading', text: 'Folio' },
-  { id: 6, url: 'dashboard/admin', text: 'Traders' },
-  { id: 7, url: 'dashboard/admin/transactions', text: 'User Transactions' },
+  { id: 6, url: 'admin', text: 'Traders' },
+  { id: 7, url: 'admin/transactions', text: 'User Transactions' },
 ];
 
 const NavLinks = () => {
