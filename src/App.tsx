@@ -34,7 +34,7 @@ import { loader as adminLoader } from './pages/DashboardAdmin/DashboardAdmin';
 import { loader as adminReceiptsLoader } from './pages/DashboardAdmin/ReceiptsAdmin';
 import { loader as adminTradersLoader } from './pages/DashboardAdmin/TradersAdmin';
 import ViewUser, { loader as adminViewLoader } from './pages/DashboardAdmin/ViewUser';
-import EditUser from './pages/DashboardAdmin/EditUser';
+import EditUser, { loader as adminEditLoader } from './pages/DashboardAdmin/EditUser';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,7 +111,7 @@ const router = createBrowserRouter([
           {
             path: 'edit/:id',
             element: <EditUser />,
-            loader: adminReceiptsLoader(queryClient, store),
+            loader: adminEditLoader(queryClient, store),
           },
         ],
       },
