@@ -1,4 +1,4 @@
-import { redirect, useLoaderData } from 'react-router-dom';
+import { NavLink, redirect, useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customFetch } from '../../utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -17,7 +17,7 @@ interface Wallet {
   balance: string;
 }
 
-interface Trader {
+export interface Trader {
   id: number;
   email: string;
   first_name: string;
@@ -375,9 +375,18 @@ const TradersAdmin = () => {
                               </button>
                             </>
                           ) : activeTab === 'current' ? (
-                            <button className="px-6 py-1 rounded text-sm font-medium hover:opacity-80 transition-opacity">
-                              Transactions
-                            </button>
+                            <div>
+                              <button className="px-6 py-1 rounded text-sm font-medium hover:opacity-80 transition-opacity">
+                                <NavLink to={`/admin/edit/${trader.id}`}>
+                                  Edit
+                                </NavLink>
+                              </button>
+                              <button className="px-6 py-1 rounded text-sm font-medium hover:opacity-80 transition-opacity">
+                                <NavLink to={`/admin/view/${trader.id}`}>
+                                  View
+                                </NavLink>
+                              </button>
+                            </div>
                           ) : (
                             <span className="text-sm font-medium text-red-500">
                               Rejected

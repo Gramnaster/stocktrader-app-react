@@ -8,6 +8,8 @@ export { default as DashboardUser } from './DashboardUser/DashboardUser';
 export { default as DashboardAdmin } from './DashboardAdmin/DashboardAdmin';
 export { default as TradersAdmin } from './DashboardAdmin/TradersAdmin';
 export { default as ReceiptsAdmin } from './DashboardAdmin/ReceiptsAdmin';
+export { default as ViewAdmin } from './DashboardAdmin/ViewUser';
+export { default as EditAdmin } from './DashboardAdmin/EditUser';
 export { default as Companies } from './Companies/Companies';
 export { default as About } from './About/About';
 export { default as Error } from './ZZMisc/Error';

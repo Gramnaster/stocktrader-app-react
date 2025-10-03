@@ -32,7 +32,9 @@ import { loader as receiptsLoader } from './pages/Receipts/Receipts';
 import { loader as stocktradingLoader } from './pages/Stocktrading/Stocktrading';
 import { loader as adminLoader } from './pages/DashboardAdmin/DashboardAdmin';
 import { loader as adminReceiptsLoader } from './pages/DashboardAdmin/ReceiptsAdmin';
-import { loader as traderReceiptsLoader } from './pages/DashboardAdmin/TradersAdmin';
+import { loader as adminTradersLoader } from './pages/DashboardAdmin/TradersAdmin';
+import ViewUser, { loader as adminViewLoader } from './pages/DashboardAdmin/ViewUser';
+import EditUser from './pages/DashboardAdmin/EditUser';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -94,11 +96,21 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <TradersAdmin />,
-            loader: traderReceiptsLoader(queryClient, store),
+            loader: adminTradersLoader(queryClient, store),
           },
           {
             path: 'transactions',
             element: <ReceiptsAdmin />,
+            loader: adminReceiptsLoader(queryClient, store),
+          },
+          {
+            path: 'view/:id',
+            element: <ViewUser />,
+            loader: adminViewLoader(queryClient, store),
+          },
+          {
+            path: 'edit/:id',
+            element: <EditUser />,
             loader: adminReceiptsLoader(queryClient, store),
           },
         ],

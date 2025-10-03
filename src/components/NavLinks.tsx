@@ -35,8 +35,8 @@ const NavLinks = () => {
           return null;
 
         if (
-          (url === 'dashboard/admin' ||
-            url === 'dashboard/admin/transactions') &&
+          (url === 'admin' ||
+            url === 'admin/transactions') &&
           (!user || user.user_role !== 'admin')
         )
           return null;

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 
-interface User {
+export interface User {
   email: string;
   first_name: string;
   id: number;
