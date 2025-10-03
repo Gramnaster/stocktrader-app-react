@@ -104,7 +104,7 @@ const StocksList = () => {
                     className="cursor-pointer hover:bg-gray-100 hover:bg-opacity-10 transition-colors"
                   >
                     <td className="hover:text-pink-400 transition-colors p-4 text-xs font-normal">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         {stock.logo_url ? (
                           <img
                             src={stock.logo_url}
@@ -116,14 +116,20 @@ const StocksList = () => {
                             {stock.ticker.charAt(0)}
                           </div>
                         )}
-                        <span className="font-bold">[{stock.ticker}]</span>
+                        <span className="font-extrabold text-[16px]">{stock.ticker}</span>
                         <span className="text-gray-400">{stock.name}</span>
                       </div>
                     </td>
-                    <td className="text-right p-4 text-xs font-normal">{stock.current_price}</td>
-                    <td className="text-right p-4 text-xs font-normal">{stock.daily_change}</td>
-                    <td className="text-right p-4 text-xs font-normal">{prevClose.toFixed(2)}</td>
-                    <td className="text-right p-4 text-xs font-normal">
+                    <td className="text-right p-4 text-sm font-normal">{stock.current_price}</td>
+                    <td className="text-right p-4 text-sm font-extrabold">
+                      {stock.daily_change > 0 ? (
+                        <span className='text-green-500'> {stock.daily_change}</span>
+                      ) : (
+                        <span className='text-red-500'> {stock.daily_change}</span>
+                      )}
+                      </td>
+                    <td className="text-right p-4 text-sm font-normal">{prevClose.toFixed(2)}</td>
+                    <td className="text-right p-4 text-sm font-normal">
                       {(Number(stock.market_cap) / 1_000_000_000).toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,

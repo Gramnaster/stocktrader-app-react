@@ -17,6 +17,7 @@ const Landing = () => {
       <Hero />
       <div className='align-element pt-4 pb-10'>
         <Detail />
+        <p className='mb-15 font-light'>Check out some of the companies you can add to your portfolio</p>
         <StocksList />
       </div>
     </div>
