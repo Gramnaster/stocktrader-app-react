@@ -5,6 +5,8 @@ import {
   DashboardUser,
   ReceiptsAdmin,
   TradersAdmin,
+  ViewAdmin,
+  EditAdmin,
   Home,
   Login,
   Receipts,
@@ -33,8 +35,8 @@ import { loader as stocktradingLoader } from './pages/Stocktrading/Stocktrading'
 import { loader as adminLoader } from './pages/DashboardAdmin/DashboardAdmin';
 import { loader as adminReceiptsLoader } from './pages/DashboardAdmin/ReceiptsAdmin';
 import { loader as adminTradersLoader } from './pages/DashboardAdmin/TradersAdmin';
-import ViewUser, { loader as adminViewLoader } from './pages/DashboardAdmin/ViewUser';
-import EditUser, { loader as adminEditLoader } from './pages/DashboardAdmin/EditUser';
+import { loader as adminViewLoader } from './pages/DashboardAdmin/ViewUser';
+import { loader as adminEditLoader } from './pages/DashboardAdmin/EditUser';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -105,12 +107,12 @@ const router = createBrowserRouter([
           },
           {
             path: 'view/:id',
-            element: <ViewUser />,
+            element: <ViewAdmin />,
             loader: adminViewLoader(queryClient, store),
           },
           {
             path: 'edit/:id',
-            element: <EditUser />,
+            element: <EditAdmin />,
             loader: adminEditLoader(queryClient, store),
           },
         ],

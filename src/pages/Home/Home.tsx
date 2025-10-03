@@ -1,5 +1,6 @@
 import { Outlet, useNavigation } from 'react-router-dom';
 import { Navbar, Loading } from '../../components';
+import Copyright from './Copyright';
 // import Landing from './Landing';
 
 const Home = () => {
@@ -7,7 +8,7 @@ const Home = () => {
   const isPageLoading = navigation.state === 'loading';
 
   return (
-    <>
+    <section className='items-center text-center'>
       {/* <Header /> */}
       <Navbar />
       {isPageLoading ? (
@@ -17,7 +18,8 @@ const Home = () => {
           <Outlet />
         </section>
       )}
-    </>
+      <Copyright />
+    </section>
   );
 };
 export default Home;

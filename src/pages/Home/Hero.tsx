@@ -11,7 +11,7 @@ const Hero = () => {
         className="w-full aspect-1440/701 bg-cover bg-center flex justify-center items-center flex-col"
         style={{ backgroundImage: `url(${mainBackground2})` }}
       >
-        <h1 className="text-5xl text-center mb-[50px] font-">
+        <h1 className="text-6xl text-center mb-[50px] font-light">
           ORBITAL FINANCES
         </h1>
         <h4 className="mb-[16px]">

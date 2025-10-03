@@ -1,6 +1,8 @@
 import { StocksList } from '../../components';
 // import { customFetch } from '../../utils';
 import Detail from './Detail';
+import Footer from './Footer';
+import FooterCTA from './FooterCTA';
 import Hero from './Hero';
 
 // const url = '/stocks'
@@ -20,6 +22,8 @@ const Landing = () => {
         <p className='mb-15 font-light'>Check out some of the companies you can add to your portfolio</p>
         <StocksList />
       </div>
+      <FooterCTA />
+      <Footer />
     </div>
   );
 };
