@@ -209,6 +209,19 @@ const Stocktrading = () => {
     }
   }, [allStocks, selectedStockId]);
 
+  // Auto-select portfolio stock when switching to sell tab
+  useEffect(() => {
+    if (activeTab === 'sell' && portfolio && portfolio.length > 0) {
+      // Check if current selectedStockId exists in portfolio
+      const stockInPortfolio = portfolio.find((item: PortfolioItem) => item.stock.id === selectedStockId);
+      
+      // If current selection is not in portfolio, select the first portfolio stock
+      if (!stockInPortfolio) {
+        setSelectedStockId(portfolio[0].stock.id);
+      }
+    }
+  }, [activeTab, portfolio, selectedStockId]);
+
   // Handle stock selection change
   const handleStockSelection = (stockId: string) => {
     const newStockId = parseInt(stockId);
@@ -251,7 +264,7 @@ const Stocktrading = () => {
       );
       return response.data;
     },
-    onMutate: async ({ quantity }) => {
+    onMutate: async ({ quantity, ticker }) => {
       await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
       await queryClient.cancelQueries({ queryKey: ['portfolio', user?.id] });
 
@@ -267,6 +280,33 @@ const Stocktrading = () => {
         ...old,
         balance: (parseFloat(old?.balance || '0') - totalCost).toFixed(2)
       }));
+
+      // Optimistically update portfolio (add to existing or create new entry)
+      queryClient.setQueryData(['portfolio', user?.id], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        
+        const existingItemIndex = old.findIndex((item: PortfolioItem) => item.stock.ticker === ticker);
+        
+        if (existingItemIndex >= 0) {
+          // Update existing portfolio item
+          return old.map((item: PortfolioItem, index: number) => {
+            if (index === existingItemIndex) {
+              const currentQuantity = parseInt(item.quantity);
+              const newQuantity = currentQuantity + quantity;
+              return {
+                ...item,
+                quantity: newQuantity.toString(),
+                current_market_value: (newQuantity * price).toFixed(2)
+              };
+            }
+            return item;
+          });
+        } else {
+          // Add new portfolio item (this is optimistic and may not match server structure exactly)
+          // The real data will come from the server response and invalidation
+          return old;
+        }
+      });
 
       return { previousWallet, previousPortfolio };
     },
@@ -301,7 +341,7 @@ const Stocktrading = () => {
       );
       return response.data;
     },
-    onMutate: async ({ quantity }) => {
+    onMutate: async ({ quantity, ticker }) => {
       await queryClient.cancelQueries({ queryKey: ['wallet', user?.id] });
       await queryClient.cancelQueries({ queryKey: ['portfolio', user?.id] });
 
@@ -317,6 +357,27 @@ const Stocktrading = () => {
         ...old,
         balance: (parseFloat(old?.balance || '0') + totalRevenue).toFixed(2)
       }));
+
+      // Optimistically update portfolio (reduce quantity or remove if quantity becomes 0)
+      queryClient.setQueryData(['portfolio', user?.id], (old: any) => {
+        if (!old || !Array.isArray(old)) return old;
+        
+        return old.map((item: PortfolioItem) => {
+          if (item.stock.ticker === ticker) {
+            const currentQuantity = parseInt(item.quantity);
+            const newQuantity = currentQuantity - quantity;
+            
+            // If quantity becomes 0 or less, we'll let the server response handle removal
+            // For optimistic update, just update the quantity
+            return {
+              ...item,
+              quantity: Math.max(0, newQuantity).toString(),
+              current_market_value: (Math.max(0, newQuantity) * price).toFixed(2)
+            };
+          }
+          return item;
+        }).filter((item: PortfolioItem) => parseInt(item.quantity) > 0); // Remove items with 0 quantity
+      });
 
       return { previousWallet, previousPortfolio };
     },
