@@ -13,10 +13,12 @@ import Hero from './Hero';
 
 const Landing = () => {
   return (
-    <div className='text-center'>
+    <div className='text-center pb-10'>
       <Hero />
-      <Detail />
-      <StocksList />
+      <div className='align-element pt-4 pb-10'>
+        <Detail />
+        <StocksList />
+      </div>
     </div>
   );
 };

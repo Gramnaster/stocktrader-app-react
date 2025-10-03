@@ -86,7 +86,7 @@ const Signup = () => {
             />
             <FormInput
               type="text"
-              label="Middle Name (required)"
+              label="Middle Name"
               name="middle_name"
               placeholder="Chameleon"
             />
