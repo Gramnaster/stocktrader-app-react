@@ -28,10 +28,6 @@ const socialLists = [
   },
 ];
 
-socialLists.map((socialList) => {
-  return console.log(socialList);
-});
-
 const Footer = () => {
   return (
     <div
@@ -51,9 +47,9 @@ const Footer = () => {
               </h1>
               <ul className="text-sm font-light gap-y-3">
                 {Object.values(socialList)[1].map(
-                  (links: string[], index: number) => {
+                  (links: string, index: number) => {
                     return (
-                      <li key={links[index]}>
+                      <li key={`${socialList.id}-${index}`}>
                         <p>{links}</p>
                       </li>
                     );

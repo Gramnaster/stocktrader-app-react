@@ -8,7 +8,7 @@ const Home = () => {
   const isPageLoading = navigation.state === 'loading';
 
   return (
-    <section className='items-center text-center'>
+    <section className=''>
       {/* <Header /> */}
       <Navbar />
       {isPageLoading ? (

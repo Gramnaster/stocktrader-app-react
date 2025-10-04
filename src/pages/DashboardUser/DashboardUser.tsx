@@ -6,7 +6,7 @@ const DashboardUser = () => {
   const isPageLoading = navigation.state === 'loading';
 
   return (
-    <div>
+    <div className='align-element'>
       {isPageLoading ? (
         <Loading />
       ) : (

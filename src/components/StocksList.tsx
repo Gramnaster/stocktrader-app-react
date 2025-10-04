@@ -24,13 +24,21 @@ const StocksList = () => {
   const fetchStocks = async () => {
     try {
       const response = await customFetch.get('/stocks');
-      console.log(response.data);
+      console.log('API Response:', response.data);
+      
+      // Ensure response.data is an array
+      if (!Array.isArray(response.data)) {
+        console.error('API did not return an array:', response.data);
+        return [];
+      }
+      
       return response.data;
     } catch (error) {
-      console.error(error);
-      throw error;
+      console.error('Error fetching stocks:', error);
+      return [];
     }
   };
+
   useEffect(() => {
     const getStocks = async () => {
       const data = await fetchStocks();
@@ -39,20 +47,22 @@ const StocksList = () => {
     getStocks();
   }, []);
 
-  // Filter and sort stocks
-  const filteredAndSortedStocks = stocks
+  // Filter and sort stocks - add safety checks
+  const filteredAndSortedStocks = Array.isArray(stocks) ? stocks
     .filter((stock) => {
+      if (!stock) return false;
+      
       const searchLower = searchWord.toLowerCase();
-      const matchesName = stock.name.toLowerCase().includes(searchLower);
-      const matchesTicker = stock.ticker.toLowerCase().includes(searchLower);
-      const matchesExchange = stock.exchange.toLowerCase().includes(searchLower);
+      const matchesName = stock.name?.toLowerCase().includes(searchLower) || false;
+      const matchesTicker = stock.ticker?.toLowerCase().includes(searchLower) || false;
+      const matchesExchange = stock.exchange?.toLowerCase().includes(searchLower) || false;
       
       return matchesName || matchesTicker || matchesExchange;
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '')) : [];
 
   return (
-    <div>
+    <div className='align-element'>
       {/* Search Bar */}
       <div className="bg-[#1e1b2e] rounded-lg p-4 border border-gray-700 mb-4">
         <div className="flex items-center gap-4">
