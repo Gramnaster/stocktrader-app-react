@@ -11,7 +11,8 @@ export const customFetch = axios.create({
 
 console.log('API Base URL:', baseURL);
 
-customFetch.defaults.headers.common['Accept'] = '*/*';
+customFetch.defaults.headers.common['Accept'] = 'application/json';
+customFetch.defaults.headers.common['Content-Type'] = 'application/json';
 
 customFetch.interceptors.request.use(
   (config) => {

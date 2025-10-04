@@ -12,7 +12,6 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-  // Uncomment proxy when using local backend on localhost:3001
   server: {
     proxy: {
       '/api': 'http://localhost:3001',
