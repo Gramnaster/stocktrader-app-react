@@ -19,7 +19,7 @@ Deployed On: Render
 ```
 Language: Ruby, Ruby on Rails
 Database: PostgreSQL
-Deployed On: Self-Deployed w/ Docker + Ngrok
+Deployed On: Render
 ```
 
 ### Customer-Facing Frontend Images
